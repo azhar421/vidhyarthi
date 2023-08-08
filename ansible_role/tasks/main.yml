@@ -1,0 +1,58 @@
+---
+- name: Install Apache
+  yum: name=httpd  state=present
+  when: ansible_os_family == "Redhat"
+- name: Install Apache
+  apt: name=apache2  state=present
+  when: ansible_os_family == "Debian"
+- name: Install Java
+  yum: name=openjdk-8-jdk  state=present
+  when: ansible_os_family == "Redhat"
+- name: Install Java
+  apt: name=openjdk-8-jdk  state=present
+  when: ansible_os_family == "Debian"
+- name: Install Maven
+  yum: name=maven  state=present
+  when: ansible_os_family == "Redhat"
+- name: Install Maven
+  apt: name=maven  state=present
+  when: ansible_os_family == "Debian"
+- name: Install mysql
+  yum: name=mysql-server  state=present
+  when: ansible_os_family == "Redhat"
+- name: Install mysql
+  apt: name=mysql-server  state=present
+  when: ansible_os_family == "Debian"
+- name: Enable service apache2, and not touch the state
+  service:
+    name: apache2
+    enabled: yes
+- name: Enable service mysql-server
+  service:
+    name: mysql
+    enabled: yes
+  notify: restart mysql
+- name: Add several users
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    state: present
+  loop:
+    - name: testuser1
+      password: "1990"
+    - name: testuser2
+      password: "1994"
+- name: Clone a repo with separate git directory
+  git:
+    repo: https://github.com/opstree/spring3hibernate.git
+    dest: /home/ubuntu/ansi_git
+    version: master
+- name: Create a directory 
+  file:
+    path: /home/ubuntu/ansi-dir1/ansi-dir2
+    state: directory
+    owner: testuser1
+    mode: '0777'
+
+    
+      
