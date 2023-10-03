@@ -1,0 +1,7 @@
+---
+# defaults file for postgresql_role
+
+postgresql_version: "15"
+uninstall_postgresql_redhat: true
+uninstall_postgresql_debian: true
+auth_timeout: 2min

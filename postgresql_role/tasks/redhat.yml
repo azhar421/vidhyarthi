@@ -1,0 +1,49 @@
+---
+- name: Update all packages to their latest version
+  package:
+    name: "*"
+    state: latest
+    update_cache: yes
+- name: Download the PostgreSQL repository RPM
+  get_url:
+    url: https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dest: /tmp/pgdg-redhat-repo-latest.noarch.rpm
+- name: Install PostgreSQL repository RPM
+  dnf:
+    name: /tmp/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+- name: Install "postgresql" packages
+  dnf:
+    name:
+      - postgresql{{ postgresql_version }}-server
+      - postgresql-contrib
+    state: present 
+      
+- name: Find out if PostgreSQL is initialized
+  stat:
+    path: "/usr/pgsql-15/bin/postgresql-15-setup initdb"
+  register: postgres_data
+- name: Start "postgresql", if not started
+  service:
+    name: postgresql-{{ postgresql_version }}
+    state: started
+- name: Enable postgresql
+  service:
+    name: postgresql-{{ postgresql_version }}
+    enabled: yes
+
+- name: Connect to postgres database, create aman user, and grant access to database and products table
+  postgresql_user:
+    db: postgres
+    name: aman
+    password: ceec4eif7ya
+    priv: "CONNECT/products:ALL"
+    expires: "Jan 31 2024"
+
+- postgresql_db:
+    name: tower
+
+- name: Uninstall postgresql
+  shell: dnf remove postgresql -y
+  when: uninstall_postgresql_redhat
+

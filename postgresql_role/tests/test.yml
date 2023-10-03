@@ -1,0 +1,10 @@
+---
+- hosts: web
+  become: yes
+  roles:
+    - /home/azhar/ansible_assignment_/Ansible-batch-22/postgresql_role
+
+
+
+ 
+
